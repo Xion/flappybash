@@ -27,8 +27,8 @@ tick() {
 
     case "$KEY" in
         q) exit ;;
-        *[!\ ]*) ;;     # non-space
-        *) VY='-100'; KEY=. ;;  # space
+        *[!\ ]*) ;;            # non-space
+        *) VY='-70'; KEY=. ;;  # space
     esac
 
     VY=`_ "$VY+($AY*$DT)"`
