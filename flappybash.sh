@@ -7,12 +7,6 @@
 # Note: requires UTF8 terminal
 #
 
-# wrapper over bc (basic POSIX calculator) that makes all computations shorter
-_() { echo "$*" | bc; }
-# truncate fractional part
-t() { printf "%.*f" 0 "$1"; }
-
-
 W=`tput cols`
 H=`tput lines`
 DT=0.05  # 20 FPS
@@ -33,12 +27,12 @@ tick() {
 
     case "$KEY" in
         q) exit ;;
-        *[!\ ]*) AY=100; VY=0 ;;     # non-space
-        *) AY='-100'; KEY=. ;;  # space
+        *[!\ ]*) ;;     # non-space
+        *) VY='-100'; KEY=. ;;  # space
     esac
 
     VY=`_ "$VY+($AY*$DT)"`
-    Y=`_ "$Y+($VY*$DT)"`
+    Y=`_ "y=$Y+($VY*$DT);if(y<0)0 else if(y>$H)$H else y"`
 
     # Draw
     ######
@@ -46,7 +40,7 @@ tick() {
     clear
 
     # draw the player (bold white-on-red)
-    echo -en "\e[`t $Y`;${X}f\e[1;37;42mB\e[0m"
+    echo -en "\e[`t $Y`;${X}f\e[1;37;41mB\e[0m"
 
     # schedule the next call of this function
     ( sleep $DT; kill -ALRM $$ ) &
@@ -58,6 +52,12 @@ quit() {
     echo -en "\e[0m"
     clear
 }
+
+
+# wrapper over bc (basic POSIX calculator) that makes all computations shorter
+_() { echo "$*" | bc; }
+# truncate fractional part
+t() { printf "%.*f" 0 "$1"; }
 
 
 #
