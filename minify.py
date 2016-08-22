@@ -38,7 +38,7 @@ def main(argv):
     minified = minified.replace('&;}', '&}')
 
     print(source.splitlines()[0])  # copy the original shebang
-    print(minified)
+    print(minified.encode('utf8'))
 
 
 if __name__ == '__main__':
