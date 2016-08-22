@@ -10,9 +10,10 @@
 W=`tput cols`
 H=`tput lines`
 H2=$[H/2]
+H4=$[H/4]
 
 DT=0.05  # 20 FPS
-G=3  # minimum height of pipe gap (is double this number)
+G=2  # minimum height of pipe gap (is double this number)
 
 KEY=.  # last pressed key (dot is ignored)
 X=3
@@ -23,6 +24,7 @@ DEAD=0
 # current pipe is stored as an array of $H chars
 P=( )  # start as empty array
 PX=''  # pipe's current X
+PVX='-100'
 
 
 tick() {
@@ -34,11 +36,14 @@ tick() {
     case "$KEY" in
         q) exit ;;
         *[!\ ]*) ;;            # non-space
-        *) VY='-70'; KEY=. ;;  # space
+        *) VY='-60'; KEY=. ;;  # space
     esac
 
     VY=`_ "$VY+($AY*$DT)"`
     Y=`_ "y=$Y+($VY*$DT);if(y<0)0 else if(y>$H)$H else y"`
+
+    PX=`_ "$PX+($PVX*$DT)"`; PX=`t $PX`
+    if [ $PX -le 0 ]; then np; fi
 
     # Draw
     ######
@@ -59,9 +64,10 @@ tick() {
 
 # create a new pipe and place it all the way to right
 np() {
-    local u=$[RANDOM % (H2-G)]  # upper pipe is < this coordinate
-    local l=$[H2 + G + RANDOM % (H2-G)]  # lower pipe is >= this one
+    local u=$[H4 + RANDOM % (H2-H4-G)]  # upper pipe is < this coordinate
+    local l=$[H2 + G + RANDOM % (H2-H4-G)]  # lower pipe is >= this one
 
+    P=( )
     for ((i=0; i<$u; i++)) do P[i]='#'; done
     for ((i=$u; i<$l; i++)) do P[i]=' '; done
     for ((i=$l; i<$H; i++)) do P[i]='#'; done
