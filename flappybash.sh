@@ -1,13 +1,9 @@
 #!/bin/bash
 
-#
 # FLAPPY BASH
 # by Xion
-#
-# Note: requires UTF8 terminal
-#
 
-W=`tput cols`
+W=${1-`tput cols`}
 H=`tput lines`
 W2=$[W/2]
 H2=$[H/2]
@@ -86,7 +82,7 @@ quit() {
     tput rmcup
     echo -en "\e[0m"
     clear
-    if [ $DEAD -gt 0 ]; then printf "score:$S\ngit gud\n"; fi
+    if [ $DEAD -gt 0 ]; then printf "score:$S (diff:-$W)\ngit gud\n"; fi
     exit
 }
 
