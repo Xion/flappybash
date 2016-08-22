@@ -9,14 +9,20 @@
 
 W=`tput cols`
 H=`tput lines`
+H2=$[H/2]
+
 DT=0.05  # 20 FPS
+G=3  # minimum height of pipe gap (is double this number)
 
 KEY=.  # last pressed key (dot is ignored)
 X=3
-Y=$[H / 2]
+Y=$H2
 VY=0  # vertical velocity
 AY=100  # vertical acceleration
 DEAD=0
+# current pipe is stored as an array of $H chars
+P=( )  # start as empty array
+PX=''  # pipe's current X
 
 
 tick() {
@@ -39,11 +45,27 @@ tick() {
 
     clear
 
+    # draw the pipe
+    for ((i=0; i<$H; i++)); do
+        echo -en "\e[$i;${PX}f\e[1;32;49m${P[i]}\e[0m"  # bold green-on-default
+    done
+
     # draw the player (bold white-on-red)
     echo -en "\e[`t $Y`;${X}f\e[1;37;41mB\e[0m"
 
     # schedule the next call of this function
     ( sleep $DT; kill -ALRM $$ ) &
+}
+
+# create a new pipe and place it all the way to right
+np() {
+    local u=$[RANDOM % (H2-G)]  # upper pipe is < this coordinate
+    local l=$[H2 + G + RANDOM % (H2-G)]  # lower pipe is >= this one
+
+    for ((i=0; i<$u; i++)) do P[i]='#'; done
+    for ((i=$u; i<$l; i++)) do P[i]=' '; done
+    for ((i=$l; i<$H; i++)) do P[i]='#'; done
+    PX=$[W-1]  # start from the right side
 }
 
 quit() {
@@ -71,6 +93,7 @@ trap quit ERR EXIT
 # set terminal title and start main loop
 printf "\e]0;FLAPPY BASH\007"
 trap tick ALRM
+np  # create new pipe
 tick
 while :; do
     read -rsn1 KEY
