@@ -4,6 +4,7 @@ Script to minify that other script.
 """
 from __future__ import print_function
 
+import re
 import sys
 
 import bs4
@@ -26,7 +27,18 @@ def main(argv):
     html = bs4.BeautifulSoup(response.text, 'html.parser')
     textarea = [ta for ta in html.find_all('textarea')
                 if ta.get('name') != 'user_source'][0]
-    print(textarea.text)
+    minified = textarea.text
+
+    # fix minifier bugs:
+    # * semicolon before function declaration requires additional whitespace
+    # * ampersand (for background jobs) gets an erroneous semicolon
+    #   at the end of a function
+    minified = re .sub(
+        r';(\w+)\(\)', lambda m: '; %s()' % m.group(1), minified)
+    minified = minified.replace('&;}', '&}')
+
+    print("#!/bin/bash")
+    print(minified)
 
 
 if __name__ == '__main__':
