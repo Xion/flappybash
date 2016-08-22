@@ -20,7 +20,7 @@ def main(argv):
     with open(filename) as f:
         source = f.read()
 
-    response = requests.post(MINIFIER_URL, params={'user_source': source})
+    response = requests.post(MINIFIER_URL, data={'user_source': source})
     response.raise_for_status()
 
     html = bs4.BeautifulSoup(response.text, 'html.parser')
