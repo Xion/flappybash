@@ -37,7 +37,7 @@ def main(argv):
         r';(\w+)\(\)', lambda m: '; %s()' % m.group(1), minified)
     minified = minified.replace('&;}', '&}')
 
-    print("#!/bin/bash")
+    print(source.splitlines()[0])  # copy the original shebang
     print(minified)
 
 
