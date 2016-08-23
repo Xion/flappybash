@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# ^ Unlike #!/bin/bash, this shebang will likely find bash 4.0 on OSX if installed.
 
 # FLAPPY BASH
 # by Xion
