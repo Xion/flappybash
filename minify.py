@@ -11,13 +11,17 @@ import bs4
 import requests
 
 
-DEFAULT_FILENAME = './flappybash.sh'
+DEFAULT_INPUT_FILE = './flappybash.sh'
+DEFAULT_OUTPUT_FILE = './release/flappybash.sh'
+
 MINIFIER_URL = 'http://bash-minifier.appspot.com/'
+
+LIMIT = 1234
 
 
 def main(argv):
     args = argv[1:]
-    filename = args[0] if args else DEFAULT_FILENAME
+    filename = args[0] if args else DEFAULT_INPUT_FILE
     with open(filename) as f:
         source = f.read()
 
@@ -37,8 +41,22 @@ def main(argv):
         r';(\w+)\(\)', lambda m: '; %s()' % m.group(1), minified)
     minified = minified.replace('&;}', '&}')
 
-    print(source.splitlines()[0])  # copy the original shebang
-    print(minified.encode('utf8'))
+    # copy the original shebang and check final size against the limit
+    minified = (source.splitlines()[0] + '\n' + minified).encode('utf8')
+    size = len(minified) + 1  # +1 to account for EOF in the final file
+    if size < LIMIT:
+        print("Phew, output is below the size limit (%s < %s)" % (
+            size, LIMIT), file=sys.stderr)
+    else:
+        print("ZOMG we're hitting the size limit!!!one (%s >= %s)" % (
+            size, LIMIT), file=sys.stderr)
+
+    # write it to the file or standard output
+    output = sys.stdout
+    if output.isatty():
+        output = open(DEFAULT_OUTPUT_FILE, 'w')
+    with output as out:
+        print(minified, file=out)
 
 
 if __name__ == '__main__':
