@@ -5,7 +5,7 @@
 # by Xion
 
 W=${1-`tput cols`}
-H=`tput lines`
+H=${2-`tput lines`}
 W2=$[W/2]
 H2=$[H/2]
 H4=$[H/4]
@@ -86,7 +86,8 @@ np() {
 q() {
     $p "\e[?12l\e[?25h"  # cursor on
     tput rmcup
-    $e -en "\e[0m"
+    $e -en "\e[0m"  # reset text style and color
+    clear
 
     # handle failure
     if [ $D -gt 0 ]; then

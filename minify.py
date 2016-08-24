@@ -4,6 +4,7 @@ Script to minify that other script.
 """
 from __future__ import print_function
 
+import os
 import re
 import sys
 
@@ -36,14 +37,13 @@ def main(argv):
     # fix minifier bugs:
     # * semicolon before function declaration requires additional whitespace
     # * ampersand (for background jobs) gets an erroneous semicolon
-    #   at the end of a function
-    minified = re .sub(
+    minified = re.sub(
         r';(\w+)\(\)', lambda m: '; %s()' % m.group(1), minified)
-    minified = minified.replace('&;}', '&}')
+    minified = minified.replace('&;', '&')
 
     # copy the original shebang and check final size against the limit
     minified = (source.splitlines()[0] + '\n' + minified).encode('utf8')
-    size = len(minified) + 1  # +1 to account for EOF in the final file
+    size = len(minified)
     if size < LIMIT:
         print("Phew, output is below the size limit (%s < %s)" % (
             size, LIMIT), file=sys.stderr)
@@ -55,8 +55,9 @@ def main(argv):
     output = sys.stdout
     if output.isatty():
         output = open(DEFAULT_OUTPUT_FILE, 'w')
+        os.chmod(DEFAULT_OUTPUT_FILE, 0755)
     with output as out:
-        print(minified, file=out)
+        print(minified, end='', file=out)
 
 
 if __name__ == '__main__':
