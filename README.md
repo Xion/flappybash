@@ -2,6 +2,8 @@
 
 Can _you_ beat the Unix pipes?
 
+![FLAPPY BASH](http://xion.io/images/flappybash.jpg)
+
 ## Features
 
 * State-of-the-art terminal graphics
